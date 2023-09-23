@@ -1,5 +1,7 @@
 #!/bin/bash -xe
+
 # Install Httpd, MariaDB, and Wordpress for Amazon Linux 2
+# AWS Docs: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-lamp-amazon-linux-2.html
 sudo yum update -y
 sudo amazon-linux-extras install -y lamp-mariadb10.2-php7.2 php7.2
 sudo yum install -y httpd mariadb-server

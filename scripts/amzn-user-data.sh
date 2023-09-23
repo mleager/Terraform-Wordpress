@@ -1,5 +1,7 @@
 #!/bin/bash -xe
+
 # Install Httpd, MariaDB, and Wordpress for Amazon Linux
+# AWS Docs: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/install-LAMP.html
 sudo yum update -y
 sudo yum install -y httpd24 php72 mysql57-server php72-mysqlnd
 sudo wget https://wordpress.org/latest.tar.gz
