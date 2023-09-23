@@ -72,6 +72,22 @@ module "private_sg" {
   ]
 }
 
+resource "aws_launch_template" "template" {
+  name                   = "${var.project}-Template"
+  image_id               = var.use_amazonlinux2 ? local.amazonlinux2_ami_id : local.amazonlinux2023_ami_id
+  instance_type          = var.instance_type
+  vpc_security_group_ids = [module.private_sg.security_group_id]
+  user_data              = var.use_amazonlinux2 ? filebase64(var.amzn2_user_data) : filebase64(var.amzn2023_user_data)
+
+  update_default_version = true
+
+  instance_initiated_shutdown_behavior = "terminate"
+
+  iam_instance_profile {
+    arn = module.asg.iam_instance_profile_arn
+  }
+}
+
 module "asg" {
   source  = "terraform-aws-modules/autoscaling/aws"
   version = ">=6.10.0"
@@ -88,31 +104,15 @@ module "asg" {
 
   target_group_arns = module.alb.target_group_arns
 
-  launch_template_name        = "Wordpress-Template"
-  launch_template_description = "Wordpress Launch Template"
-  launch_template_version     = "$Default"
-  update_default_version      = true
+  create_launch_template = false
+  launch_template        = module.launch_template.name
 
-  # If you change Image ID to Amazon Linux 2, change the User Data attribute to match
-  image_id          = local.amazonlinux2023_ami_id
-  instance_type     = var.instance_type
-  instance_name     = var.project
   security_groups   = [module.private_sg.security_group_id]
-  user_data         = filebase64(var.amzn2023_user_data)
   ebs_optimized     = false
   enable_monitoring = false
 
-  create_iam_instance_profile = true
-  iam_instance_profile_name   = "ssm-profile"
-  iam_role_name               = "${var.project}-Instance-Role"
-  iam_role_path               = "/ec2/"
-  iam_role_description        = "IAM role for ${var.project}"
-  iam_role_tags = {
-    CustomIamRole = "no"
-  }
-  iam_role_policies = {
-    AmazonSSMManagedInstanceCore = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
-  }
+  create_iam_instance_profile = false
+  iam_instance_profile_arn    = module.instance_profile.iam_instance_profile_arn
 
   autoscaling_group_tags = {
     Name = "${var.project}-ASG"
