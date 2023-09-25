@@ -105,14 +105,22 @@ module "asg" {
   target_group_arns = module.alb.target_group_arns
 
   create_launch_template = false
-  launch_template        = module.launch_template.name
+  launch_template        = aws_launch_template.template.name
 
   security_groups   = [module.private_sg.security_group_id]
   ebs_optimized     = false
   enable_monitoring = false
 
-  create_iam_instance_profile = false
-  iam_instance_profile_arn    = module.instance_profile.iam_instance_profile_arn
+  create_iam_instance_profile = true
+  iam_role_name               = "ssm-instance-role"
+  iam_role_path               = "/ec2/"
+  iam_role_description        = "SSM role example"
+  iam_role_tags = {
+    CustomIamRole = "No"
+  }
+  iam_role_policies = {
+    AmazonSSMManagedInstanceCore = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+  }
 
   autoscaling_group_tags = {
     Name = "${var.project}-ASG"
