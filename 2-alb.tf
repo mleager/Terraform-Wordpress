@@ -9,6 +9,16 @@ module "alb_sg" {
   ingress_rules       = ["https-443-tcp", "http-80-tcp"]
   ingress_cidr_blocks = ["0.0.0.0/0"]
 
+  # ingress_with_cidr_blocks = [
+  #   {
+  #     from_port   = 443
+  #     to_port     = 443
+  #     protocol    = "tcp"
+  #     description = "Allow HTTPS to ALB"
+  #     cidr_blocks = "0.0.0.0/0"
+  #   }
+  # ]
+
   egress_with_cidr_blocks = [
     {
       from_port   = 0
@@ -24,7 +34,7 @@ module "alb" {
   source  = "terraform-aws-modules/alb/aws"
   version = ">= 8.7.0"
 
-  name = "${var.project}-ALB"
+  name = "${lower(var.project)}-alb"
 
   load_balancer_type = "application"
 
@@ -63,13 +73,20 @@ module "alb" {
     }
   ]
 
-  # http_tcp_listeners = [
-  #   {
-  #     port               = 80
-  #     protocol           = "HTTP"
-  #     target_group_index = 0
-  #   }
-  # ]
+  http_tcp_listeners = [
+    {
+      port               = 80
+      protocol           = "HTTP"
+      target_group_index = 0
+      action_type        = "redirect"
+      redirect = {
+        port        = 443
+        protocol    = "HTTPS"
+        status_code = "HTTP_302"
+        host        = "www.mark-dns.de"
+      }
+    }
+  ]
 
   lb_tags = {
     Name = "${var.project}-ALB"
