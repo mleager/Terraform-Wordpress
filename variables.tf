@@ -54,8 +54,3 @@ variable "amzn2_user_data" {
   type        = string
   description = "Relative Path to the User Data Bash Script for Amazon Linux 2"
 }
-
-variable "amzn_user_data" {
-  type        = string
-  description = "Relative Path to the User Data Bash Script for Amazon Linux"
-}
