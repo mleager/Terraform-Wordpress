@@ -9,16 +9,6 @@ module "alb_sg" {
   ingress_rules       = ["https-443-tcp", "http-80-tcp"]
   ingress_cidr_blocks = ["0.0.0.0/0"]
 
-  # ingress_with_cidr_blocks = [
-  #   {
-  #     from_port   = 443
-  #     to_port     = 443
-  #     protocol    = "tcp"
-  #     description = "Allow HTTPS to ALB"
-  #     cidr_blocks = "0.0.0.0/0"
-  #   }
-  # ]
-
   egress_with_cidr_blocks = [
     {
       from_port   = 0
