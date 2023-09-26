@@ -1,24 +1,3 @@
-data "aws_ami" "amazonlinux2" {
-  most_recent = true
-
-  filter {
-    name   = "name"
-    values = ["amzn2-ami-kernel-*"]
-  }
-
-  filter {
-    name   = "virtualization-type"
-    values = ["hvm"]
-  }
-
-  filter {
-    name   = "architecture"
-    values = ["x86_64"]
-  }
-
-  owners = ["amazon"]
-}
-
 data "aws_ami" "amazonlinux2023" {
   most_recent = true
 
@@ -41,7 +20,6 @@ data "aws_ami" "amazonlinux2023" {
 }
 
 locals {
-  amazonlinux2_ami_id    = data.aws_ami.amazonlinux2.id
   amazonlinux2023_ami_id = data.aws_ami.amazonlinux2023.id
 }
 
@@ -72,22 +50,6 @@ module "private_sg" {
   ]
 }
 
-resource "aws_launch_template" "template" {
-  name                   = "${var.project}-Template"
-  image_id               = var.use_amazonlinux2 ? local.amazonlinux2_ami_id : local.amazonlinux2023_ami_id
-  instance_type          = var.instance_type
-  vpc_security_group_ids = [module.private_sg.security_group_id]
-  user_data              = var.use_amazonlinux2 ? filebase64(var.amzn2_user_data) : filebase64(var.amzn2023_user_data)
-
-  update_default_version = true
-
-  instance_initiated_shutdown_behavior = "terminate"
-
-  iam_instance_profile {
-    arn = module.asg.iam_instance_profile_arn
-  }
-}
-
 module "asg" {
   source  = "terraform-aws-modules/autoscaling/aws"
   version = ">=6.10.0"
@@ -104,10 +66,16 @@ module "asg" {
 
   target_group_arns = module.alb.target_group_arns
 
-  create_launch_template = false
-  launch_template        = aws_launch_template.template.name
+  launch_template_name        = "${var.project}-Template"
+  launch_template_description = "${var.project} Launch Template"
+  launch_template_version     = "$Default"
+  update_default_version      = true
 
+  image_id          = local.amazonlinux2023_ami_id
+  instance_type     = var.instance_type
+  instance_name     = var.project
   security_groups   = [module.private_sg.security_group_id]
+  user_data         = filebase64(var.amzn2023_user_data)
   ebs_optimized     = false
   enable_monitoring = false
 
