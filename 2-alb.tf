@@ -24,7 +24,7 @@ module "alb" {
   source  = "terraform-aws-modules/alb/aws"
   version = ">= 8.7.0"
 
-  name = "${var.project}-ALB"
+  name = "${lower(var.project)}-alb"
 
   load_balancer_type = "application"
 
@@ -54,20 +54,27 @@ module "alb" {
     }
   ]
 
-  # https_listeners = [
-  #   {
-  #     port               = 443
-  #     protocol           = "HTTPS"
-  #     certificate_arn    = ""
-  #     target_group_index = 0
-  #   }
-  # ]
+  https_listeners = [
+    {
+      port               = 443
+      protocol           = "HTTPS"
+      certificate_arn    = module.acm.acm_certificate_arn
+      target_group_index = 0
+    }
+  ]
 
   http_tcp_listeners = [
     {
       port               = 80
       protocol           = "HTTP"
       target_group_index = 0
+      action_type        = "redirect"
+      redirect = {
+        port        = 443
+        protocol    = "HTTPS"
+        status_code = "HTTP_302"
+        host        = "www.mark-dns.de"
+      }
     }
   ]
 
