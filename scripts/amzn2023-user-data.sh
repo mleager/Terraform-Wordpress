@@ -3,8 +3,8 @@
 # Install Httpd, MariaDB, and Wordpress for Amazon Linux 2023
 # AWS Docs: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-lamp-amazon-linux-2023.html
 sudo dnf update -y
-sudo dnf install -y httpd wget php-fpm php-mysqli php-json php php-devel
-sudo dnf install -y mariadb105-server
+sudo dnf install wget php-mysqlnd httpd php-fpm php-mysqli mariadb105-server php-json php php-devel -y
+
 sudo wget https://wordpress.org/latest.tar.gz
 sudo tar -xzf latest.tar.gz
 sudo mkdir /var/www/html/wordpress
