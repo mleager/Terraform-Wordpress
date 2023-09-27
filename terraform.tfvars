@@ -15,3 +15,5 @@ db_user = "mark"
 amzn2023_user_data = "scripts/amzn2023-user-data.sh"
 
 amzn2_user_data = "scripts/amzn2-user-data.sh"
+
+ubuntu_user_data = "scripts/ubuntu-user-data.sh"
