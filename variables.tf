@@ -3,9 +3,9 @@ variable "project" {
   description = "Project Name"
 }
 
-variable "use_amazonlinux2" {
+variable "use_amazonlinux" {
   type        = bool
-  description = "Set to true if you want to use Amazon Linux 2, false for Amazon Linux 2023"
+  description = "Set to true if you want to use Amazon Linux 2023 AMI, false for Debain Ubuntu 22.04 AMI"
   default     = true
 }
 
@@ -48,11 +48,6 @@ variable "db_user" {
 variable "amzn2023_user_data" {
   type        = string
   description = "Relative Path to the User Data Bash Script for Amazon Linux 2023"
-}
-
-variable "amzn2_user_data" {
-  type        = string
-  description = "Relative Path to the User Data Bash Script for Amazon Linux 2"
 }
 
 variable "ubuntu_user_data" {

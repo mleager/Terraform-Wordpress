@@ -1,6 +1,6 @@
 project = "Wordpress"
 
-use_amazonlinux2 = true
+use_amazonlinux = true
 
 instance_type = "t2.micro"
 
@@ -13,7 +13,5 @@ db_name = "wordpress"
 db_user = "mark"
 
 amzn2023_user_data = "scripts/amzn2023-user-data.sh"
-
-amzn2_user_data = "scripts/amzn2-user-data.sh"
 
 ubuntu_user_data = "scripts/ubuntu-user-data.sh"
