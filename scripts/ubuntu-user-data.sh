@@ -1,6 +1,6 @@
 #!/bin/bash -xe
 
-# install required packages
+# Debian Ubuntu 22.04: Install Apache2, MySQL, PHP, and Dependencies
 sudo apt update -y
 sudo apt install -y apache2 \
                  ghostscript \
@@ -17,19 +17,23 @@ sudo apt install -y apache2 \
                  php-xml \
                  php-zip
 
+# Start and Enable Apache2
 sudo systemctl start apache2
 sudo systemctl enable apache2
+
+# Start and Enable MySQL
 sudo systemctl start mysql
 sudo systemctl enable mysql
 
-# allow Apache firewall
+# Allow Apache Firewall
 sudo ufw allow 'Apache Full'
 
-# creating virtual host
+# Create Virtual Host Directory and Set Permissions
 sudo mkdir /var/www/mark-dns.de
 sudo chown -R www-data.www-data /var/www/mark-dns.de/
 sudo chmod 755 /var/www/mark-dns.de/
 
+# Create Virtual Host Configuration for 'mark-dns.de'
 sudo touch /etc/apache2/sites-available/mark-dns.de.conf
 
 sudo tee /etc/apache2/sites-available/mark-dns.de.conf > /dev/null <<EOF
@@ -46,13 +50,14 @@ sudo tee /etc/apache2/sites-available/mark-dns.de.conf > /dev/null <<EOF
 </IfModule>
 EOF
 
+# Set Virtual Host as Default and Reload Apache2
 sudo a2ensite mark-dns.de
 sudo a2dissite 000-default
 sudo a2enmod rewrite
 sudo systemctl reload apache2
 
-# download wordpress and configure it.
-sudo cd /tmp/
+# Download WordPress, Move to Appropriate Directory, and Set Permissions
+cd /tmp/
 sudo wget https://wordpress.org/latest.tar.gz
 sudo tar -xzvf latest.tar.gz
 sudo mv wordpress/* /var/www/mark-dns.de/

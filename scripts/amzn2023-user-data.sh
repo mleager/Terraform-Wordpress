@@ -1,6 +1,6 @@
 #!/bin/bash -xe
 
-# Install Httpd, MySQL, PHP, Firewalld, and Dependencies
+# Amazon Linux 2023: Install Httpd, MySQL, PHP, Firewalld, and Dependencies
 # AWS Docs: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/hosting-wordpress-aml-2023.html
 sudo dnf update -y
 sudo dnf install wget php-mysqlnd httpd php-fpm php-mysqli mariadb105-server php-json php php-devel -y
@@ -45,7 +45,7 @@ sudo tee /etc/httpd/conf.d/mark-dns.de.conf > /dev/null <<EOF
 </IfModule>
 EOF
 
-# Reload the Apache configuration to apply changes
+# Reload the Apache Configuration to Apply Changes
 sudo ln -s /etc/httpd/conf.d/mark-dns.de.conf
 sudo systemctl reload httpd
 
