@@ -72,6 +72,26 @@ module "private_sg" {
   ]
 }
 
+resource "aws_launch_template" "template" {
+  name                   = "${var.project}-Template"
+  image_id               = var.use_amazonlinux ? local.amazonlinux2023_ami_id : local.ubuntu_ami_id
+  instance_type          = var.instance_type
+  vpc_security_group_ids = [module.private_sg.security_group_id]
+  user_data              = var.use_amazonlinux ? filebase64(var.amzn2023_user_data) : filebase64(var.ubuntu_user_data)
+
+  update_default_version = true
+
+  instance_initiated_shutdown_behavior = "terminate"
+
+  iam_instance_profile {
+    arn = module.asg.iam_instance_profile_arn
+  }
+
+  tags = {
+    Project = "${var.project}"
+  }
+}
+
 module "asg" {
   source  = "terraform-aws-modules/autoscaling/aws"
   version = ">=6.10.0"
@@ -88,16 +108,9 @@ module "asg" {
 
   target_group_arns = module.alb.target_group_arns
 
-  launch_template_name        = "${var.project}-Template"
-  launch_template_description = "${var.project} Launch Template"
-  launch_template_version     = "$Default"
-  update_default_version      = true
+  create_launch_template = false
+  launch_template        = aws_launch_template.template.name
 
-  image_id          = local.ubuntu_ami_id
-  instance_type     = var.instance_type
-  instance_name     = var.project
-  security_groups   = [module.private_sg.security_group_id]
-  user_data         = filebase64(var.ubuntu_user_data)
   ebs_optimized     = false
   enable_monitoring = false
 
