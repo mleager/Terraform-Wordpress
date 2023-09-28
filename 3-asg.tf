@@ -19,8 +19,30 @@ data "aws_ami" "amazonlinux2023" {
   owners = ["amazon"]
 }
 
+data "aws_ami" "ubuntu" {
+  most_recent = true
+
+  filter {
+    name   = "name"
+    values = ["ubuntu/images/hvm-ssd/ubuntu-jammy-22.04*"]
+  }
+
+  filter {
+    name   = "virtualization-type"
+    values = ["hvm"]
+  }
+
+  filter {
+    name   = "architecture"
+    values = ["x86_64"]
+  }
+
+  owners = ["amazon"]
+}
+
 locals {
   amazonlinux2023_ami_id = data.aws_ami.amazonlinux2023.id
+  ubuntu_ami_id          = data.aws_ami.ubuntu.id
 }
 
 module "private_sg" {
@@ -71,11 +93,11 @@ module "asg" {
   launch_template_version     = "$Default"
   update_default_version      = true
 
-  image_id          = local.amazonlinux2023_ami_id
+  image_id          = local.ubuntu_ami_id
   instance_type     = var.instance_type
   instance_name     = var.project
   security_groups   = [module.private_sg.security_group_id]
-  user_data         = filebase64(var.amzn2023_user_data)
+  user_data         = filebase64(var.ubuntu_user_data)
   ebs_optimized     = false
   enable_monitoring = false
 
